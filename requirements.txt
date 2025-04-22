@@ -2,3 +2,5 @@ pandas
 numpy
 polars
 neo4j
+ipykernel
+matplotlib
