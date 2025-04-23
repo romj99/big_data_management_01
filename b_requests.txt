@@ -1,0 +1,95 @@
+/////////////////////////////// 1 /////////////////////////
+
+// Top 3 most‑cited papers per conference
+MATCH (conf:Conference)-[:HAS_EDITION]->(ed:ConferenceEdition)<-[:PUBLISHED_IN]-(p:Paper)
+OPTIONAL MATCH (p)<-[c:CITES]-()
+WITH conf, p, count(c) AS citationCount
+ORDER BY conf.name, citationCount DESC
+WITH conf, collect({paper:p, citations:citationCount})[0..3] AS top3
+UNWIND top3 AS entry
+RETURN
+  conf.name        AS Conference,
+  entry.paper.title AS Paper,
+  entry.citations   AS CitationCount
+ORDER BY Conference, CitationCount DESC;
+
+
+/////////////////////////////// 2 /////////////////////////
+
+MATCH 
+  (conf:Conference)-[:HAS_EDITION]->(ed:ConferenceEdition),
+  (ed)<-[:PUBLISHED_IN]-(p:Paper)<-[:AUTHORED]-(a:Author)
+WITH 
+  conf.name          AS conference,
+  a.full_name        AS author,
+  COUNT(DISTINCT ed.edition_id) AS editionsCount
+WHERE 
+  editionsCount >= 4
+RETURN 
+  conference,
+  author,
+  editionsCount
+ORDER BY 
+  conference,
+  editionsCount DESC;
+
+/////////////////////////////// 3 /////////////////////////
+
+
+// 1) Gather, per journal, all papers published in 2022 or 2023
+MATCH (j:Journal)-[:HAS_VOLUME]->(vol:JournalVolume)<-[:PUBLISHED_IN]-(p:Paper)
+WHERE vol.year IN [2022, 2023]
+WITH j, collect(p) AS prevPapers, size(collect(p)) AS numPrevPapers
+
+// 2) Count incoming citations in 2024 to any of those papers
+UNWIND prevPapers AS oldPaper
+OPTIONAL MATCH (citing:Paper)-[:CITES]->(oldPaper)
+WHERE citing.year = 2024
+WITH j, numPrevPapers, count(citing) AS numCitations
+
+// 3) Compute impact factor, guard against division by zero
+RETURN
+  j.name            AS Journal,
+  numCitations      AS Citations2024,
+  numPrevPapers     AS Papers2022_23,
+  CASE
+    WHEN numPrevPapers > 0
+    THEN toFloat(numCitations) / numPrevPapers
+    ELSE NULL
+  END               AS ImpactFactor2024
+ORDER BY ImpactFactor2024 DESC;
+
+
+/////////////////////////////// 4 /////////////////////////
+
+// 1) Compute per‑paper citation counts
+MATCH (a:Author)-[:AUTHORED]->(p:Paper)
+OPTIONAL MATCH (p)<-[:CITES]-()
+WITH a, p, count(*) AS citations
+
+// 2) Gather all that author's citation counts into a list
+WITH a, collect(citations) AS citationList
+
+// 3) Sort ascending via APOC, then reverse via list comprehension
+WITH 
+  a.full_name AS Author, 
+  apoc.coll.sort(citationList)      AS ascList
+WITH 
+  Author, 
+  [ i IN range(size(ascList)-1, 0, -1) | ascList[i] ] AS sortedList
+
+// 4) Unwind positions and keep only those where citationCount >= rank
+UNWIND range(0, size(sortedList)-1) AS idx
+WITH 
+  Author, 
+  idx + 1             AS h, 
+  sortedList[idx]     AS citationCount
+WHERE citationCount >= h
+
+// 5) The h‑index is the maximum valid h, defaulting to 0 if none
+RETURN 
+  Author, 
+  coalesce(max(h), 0) AS HIndex
+ORDER BY HIndex DESC, Author;
+
+

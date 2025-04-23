@@ -80,3 +80,9 @@ uv pip install --upgrade fastapi
 ```bash
 python dblp-to-csv/XMLToCSV.py --annotate --neo4j dblp.xml dblp.dtd data/dblp.csv --relations author:authored_by journal:published_in
 ```
+
+## DBLP Data importing into Neo4j
+```bash
+./cypher-shell -u neo4j -p <password>  < load_all.cypher
+
+```
