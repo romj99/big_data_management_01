@@ -13,4 +13,5 @@ dependencies = [
     "pandas>=2.2.3",
     "polars==1.26",
     "pyarrow>=19.0.1",
+    "tqdm>=4.67.1",
 ]

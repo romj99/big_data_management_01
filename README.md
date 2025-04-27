@@ -1,9 +1,22 @@
 # Big Data Management for Data Science - Lab 01
 
-Description of the project.
+This project is a hands-on exploration of **graph databases** using **Neo4j**.  
+It focuses on modeling, loading, evolving, and querying large-scale research article data, inspired by the DBLP dataset.  
+The main objectives are:
 
-\table of contents.
+- **Modeling** research papers, authors, conferences, journals, keywords, and reviews as a **property graph**.
+- **Loading** real-world or synthetic data into Neo4j using Cypher and bulk loading techniques.
+- **Evolving** the database model by introducing changes such as reviewer feedback and author affiliations.
+- **Querying** the graph using Cypher queries to extract insights like citation counts, author communities, h-indexes, and impact factors.
+- **Applying Graph Algorithms** (PageRank, Community Detection, etc.) using the Neo4j Graph Data Science library to analyze graph structures.
 
+The project emphasizes clean data modeling, scalable graph instantiation, and meaningful domain-specific graph analysis.
+
+
+## Table of Contents
+- [Environment Setup with uv](#environment-setup-with-uv)
+- [DBLP Raw Data Transformation](#dblp-raw-data-transformation)
+- [Database Creation](#final-database-creation)
 
 
 
@@ -64,15 +77,9 @@ Description of the project.
 
 
 
-## DataBase creation and loading
-
-- DBLP Data downloading
-- Transform it
-- load it
-- execute queries
-- caca
-
-1. From [DBLP website](https://dblp.uni-trier.de/), download the XML raw [data](https://dblp.uni-trier.de/xml/). Mainly, the files `dblp.dtd` and `dblp.xml.gz`.
+## DBLP Raw data transformation creation and loading
+0. At the same level of this repository, create a folder called `data`. Inside `data`, create another folder called `files`.
+1. From [DBLP website](https://dblp.uni-trier.de/), download the XML raw [data](https://dblp.uni-trier.de/xml/) in `data` folder. Only the files `dblp.dtd` and `dblp.xml.gz`.
 2. Extract `dblp.xml` file from `dblp.xml.gz`.
 3. Clone this [repository](https://github.com/ThomHurks/dblp-to-csv) and execute the following command from the terminal to convert the `.xml` into `.csv` format to then preprocess:
 
@@ -80,11 +87,8 @@ Description of the project.
 python dblp-to-csv/XMLToCSV.py --annotate --neo4j dblp.xml dblp.dtd files/dblp.csv --relations author:authored_by journal:published_in
 ```
 
-## DBLP Data importing into Neo4j
-```bash
-./cypher-shell -u neo4j -p <password>  < load_all.cypher
+## Database Creation
+To create and load the final database:
 
-```
-- Does the DB need to be shut down or active?
-- I've created all files and move them into import/csv inside the path of the database created by neo4j
-- Where do i execute that command?
+1. Make sure the environment is activated (source .venv/bin/activate).
+2. For creating the final databse, execute and follow the instructions inside `main.ipynb`.
