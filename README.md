@@ -1,4 +1,4 @@
-# Big Data Management for Data Science - Lab 01
+# BDM - Lab 01 - Graph Database using Neo4j
 
 This project is a hands-on exploration of **graph databases** using **Neo4j**.  
 It focuses on modeling, loading, evolving, and querying large-scale research article data, inspired by the DBLP dataset.  
@@ -12,12 +12,15 @@ The main objectives are:
 
 The project emphasizes clean data modeling, scalable graph instantiation, and meaningful domain-specific graph analysis.
 
+**Contributors**:
+ - [asm-bse](https://github.com/asm-bse)
+ - [romj99](https://github.com/romj99)
+
 
 ## Table of Contents
 - [Environment Setup with uv](#environment-setup-with-uv)
 - [DBLP Raw Data Transformation](#dblp-raw-data-transformation)
 - [Database Creation](#final-database-creation)
-
 
 
 ## Environment handling with [uv](https://docs.astral.sh/uv/)
